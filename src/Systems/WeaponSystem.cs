@@ -8,7 +8,20 @@ namespace CloneTato.Systems;
 
 public static class WeaponSystem
 {
-    public const float WeaponDrawOffset = 10f; // small offset from player toward aim
+    public const float WeaponOrbitRadius = 18f; // distance from player center
+    private const float OrbitBobSpeed = 2.5f;   // idle bob frequency
+    private const float OrbitBobAmount = 1.5f;  // idle bob amplitude in pixels
+
+    // Fan spread angles per weapon count (radians) — symmetric around aim
+    // 1 weapon: centered. 2: ±15°. 3: -20°/0°/+20°. 4: ±12°/±32°
+    private static readonly float[][] FanOffsets =
+    [
+        [],                                                              // 0 weapons (unused)
+        [0f],                                                            // 1 weapon
+        [-0.26f, 0.26f],                                                 // 2 weapons (~15°)
+        [-0.35f, 0f, 0.35f],                                             // 3 weapons (~20°)
+        [-0.56f, -0.21f, 0.21f, 0.56f],                                  // 4 weapons (~12°/32°)
+    ];
 
     private static float GetAttackSpeedMultiplier(GameState state)
     {
@@ -34,13 +47,16 @@ public static class WeaponSystem
         else aimDir = new Vector2(1, 0);
         float aimAngle = MathF.Atan2(aimDir.Y, aimDir.X);
 
-        // Track aim angle per weapon slot (smooth lerp for visual rotation)
+        // Fan weapons out around aim direction — each weapon gets its own target angle
         int weaponCount = state.EquippedWeapons.Count;
+        int fanIdx = Math.Clamp(weaponCount, 0, FanOffsets.Length - 1);
+        var offsets = FanOffsets[fanIdx];
         for (int w = 0; w < weaponCount; w++)
         {
+            float targetAngle = aimAngle + (w < offsets.Length ? offsets[w] : 0f);
             float current = state.WeaponOrbitAngles[w];
-            float diff = NormalizeAngle(aimAngle - current);
-            state.WeaponOrbitAngles[w] = current + diff * Math.Min(1f, 12f * dt);
+            float diff = NormalizeAngle(targetAngle - current);
+            state.WeaponOrbitAngles[w] = current + diff * Math.Min(1f, 10f * dt);
         }
 
         // Tick all cooldowns and reload timers
@@ -69,7 +85,7 @@ public static class WeaponSystem
             if (state.MeleeSwipes[i].Active)
                 state.MeleeSwipes[i].Update(dt);
 
-        // Fire weapons based on slot
+        // Fire all weapons — no primary/secondary distinction, all auto-fire
         for (int w = 0; w < weaponCount; w++)
         {
             if (state.WeaponCooldowns[w] > 0) continue;
@@ -85,20 +101,21 @@ public static class WeaponSystem
                 continue;
             }
 
-            if (weapon.Def.Slot == WeaponSlot.Secondary)
+            if (weapon.Def.Type == WeaponType.Melee)
             {
-                // Secondary: fires on press, or when held and cooldown just expired
-                if (!state.IsSecondaryFiring && !state.IsSecondaryDown) continue;
-                FireSecondaryWeapon(state, w, weapon, aimDir, aimAngle);
-            }
-            else if (weapon.Def.Type == WeaponType.Melee)
-            {
-                // Melee primary: auto-fires when enemy in range (reactive)
+                // Melee: manual swing on fire press (Hades-style)
                 UpdateMeleeWeapon(state, w, weapon, aimDir, aimAngle);
+            }
+            else if (weapon.Def.IsMine || weapon.Def.IsLockOn || weapon.Def.ExplosionRadius > 0)
+            {
+                // Tactical weapons (grenades, mines, rockets, missiles): auto-fire on cooldown
+                // when enemies exist, otherwise require manual trigger
+                if (state.IsFiring || state.IsSecondaryFiring || state.IsSecondaryDown)
+                    FireSecondaryWeapon(state, w, weapon, aimDir, aimAngle);
             }
             else
             {
-                // Ranged primary: fires based on FireMode
+                // Ranged guns: auto-fire via auto-aim or manual fire
                 UpdatePrimaryWeapon(state, w, weapon, aimDir, aimAngle);
             }
         }
@@ -508,9 +525,13 @@ public static class WeaponSystem
     public static Vector2 GetWeaponWorldPosition(GameState state, int weaponIndex)
     {
         float angle = state.WeaponOrbitAngles[weaponIndex];
+        // Gentle idle bob — each weapon offset slightly so they don't bob in sync
+        float time = (float)Raylib.GetTime();
+        float bob = MathF.Sin(time * OrbitBobSpeed + weaponIndex * 1.8f) * OrbitBobAmount;
+        float radius = WeaponOrbitRadius + bob;
         return state.Player.Position + new Vector2(
-            MathF.Cos(angle) * WeaponDrawOffset,
-            MathF.Sin(angle) * WeaponDrawOffset);
+            MathF.Cos(angle) * radius,
+            MathF.Sin(angle) * radius);
     }
 
     public static float GetWeaponDrawAngle(GameState state, int weaponIndex)

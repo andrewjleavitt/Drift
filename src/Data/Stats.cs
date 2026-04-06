@@ -27,7 +27,7 @@ public struct Stats
     public static Stats Default() => new()
     {
         MaxHP = 100,
-        MoveSpeed = 80f,
+        MoveSpeed = 105f,
         DamageMultiplier = 1.0f,
         AttackSpeedMultiplier = 1.0f,
         CritChance = 0.05f,

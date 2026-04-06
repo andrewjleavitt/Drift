@@ -15,30 +15,40 @@ public class LevelUpScreen
 
     private static readonly Upgrade[] AllUpgrades =
     {
-        // --- Stat upgrades (one tier each) ---
-        new("Max HP +20", "+20 Maximum HP", new Stats { MaxHP = 20 }),
-        new("Speed +12", "+12 Move Speed", new Stats { MoveSpeed = 12f }),
-        new("Damage +10%", "+10% Damage", new Stats { DamageMultiplier = 0.10f }),
-        new("Atk Speed +12%", "+12% Attack Speed", new Stats { AttackSpeedMultiplier = 0.12f }),
+        // --- Stat upgrades ---
+        new("Max HP +25", "+25 Maximum HP", new Stats { MaxHP = 25 }),
+        new("Speed +15", "+15 Move Speed", new Stats { MoveSpeed = 15f }),
+        new("Damage +12%", "+12% Damage", new Stats { DamageMultiplier = 0.12f }),
+        new("Atk Speed +15%", "+15% Attack Speed", new Stats { AttackSpeedMultiplier = 0.15f }),
         new("Armor +3", "+3 Armor", new Stats { Armor = 3 }),
-        new("Dodge +5%", "+5% Dodge Chance", new Stats { DodgeChance = 0.05f }),
-        new("Crit +5%", "+5% Crit Chance", new Stats { CritChance = 0.05f }),
-        new("Pickup +15", "+15 Pickup Range", new Stats { PickupRange = 15f }),
-        new("XP +10%", "+10% XP Gain", new Stats { XPMultiplier = 0.10f }),
+        new("Dodge +6%", "+6% Dodge Chance", new Stats { DodgeChance = 0.06f }),
+        new("Crit +6%", "+6% Crit Chance", new Stats { CritChance = 0.06f }),
+        new("Pickup +20", "+20 Pickup Range", new Stats { PickupRange = 20f }),
+        new("XP +12%", "+12% XP Gain", new Stats { XPMultiplier = 0.12f }),
 
         // --- Dash upgrades ---
-        new("Dash Cooldown", "-0.12s Dash Cooldown", new Stats { DashCooldownReduction = 0.12f }),
-        new("Dash: Atk Speed", "30% atk speed after dash", new Stats { PostDashAttackSpeed = 0.3f }),
-        new("Dash: Move", "25% move speed after dash", new Stats { PostDashMoveSpeed = 0.25f }),
-        new("Dash: Invuln", "0.5s invuln after dash", new Stats { PostDashInvuln = 0.5f }),
+        new("Dash Cooldown", "-0.15s Dash Cooldown", new Stats { DashCooldownReduction = 0.15f }),
+        new("Dash: Atk Speed", "35% atk speed after dash", new Stats { PostDashAttackSpeed = 0.35f }),
+        new("Dash: Move", "30% move speed after dash", new Stats { PostDashMoveSpeed = 0.30f }),
+        new("Dash: Invuln", "0.6s invuln after dash", new Stats { PostDashInvuln = 0.6f }),
+
+        // --- Trade-off upgrades (high risk, high reward — the fun stuff) ---
+        new("Glass Cannon", "+40% DMG, -20 HP", new Stats { DamageMultiplier = 0.40f, MaxHP = -20 }),
+        new("Berserker", "+25% DMG, +20% Spd, -3 Armor", new Stats { DamageMultiplier = 0.25f, AttackSpeedMultiplier = 0.20f, Armor = -3 }),
+        new("Speedster", "+25 Speed, +8% Dodge", new Stats { MoveSpeed = 25f, DodgeChance = 0.08f }),
+        new("Critical Mass", "+12% Crit, +0.5x Crit DMG", new Stats { CritChance = 0.12f, CritDamage = 0.50f }),
+        new("XP Vacuum", "+80 Pickup Range", new Stats { PickupRange = 80f }),
+        new("Thick Skin", "+50 HP, +5 Armor, -12 Spd", new Stats { MaxHP = 50, Armor = 5, MoveSpeed = -12f }),
+        new("Bullet Time", "+30% Atk Spd, -10 HP", new Stats { AttackSpeedMultiplier = 0.30f, MaxHP = -10 }),
+        new("Reload Frenzy", "+40% Reload Spd", new Stats { ReloadSpeedMultiplier = 0.40f }),
 
         // --- Mechanical passives ---
         new("Ricochet", "Shots bounce to 1 enemy", default, p => p.Ricochet += 1),
-        new("Vampiric", "Melee kills heal 2 HP", default, p => p.VampiricHeal += 2),
-        new("Thorns", "Hit attackers for 15 dmg", default, p => p.ThornsDamage += 15),
+        new("Vampiric", "Melee kills heal 3 HP", default, p => p.VampiricHeal += 3),
+        new("Thorns", "Hit attackers for 20 dmg", default, p => p.ThornsDamage += 20),
         new("Explosive Kills", "Kills trigger AOE blast", default, p => p.ExplosiveKills = true),
-        new("Overclock", "Secondary CD -25%", default, p => p.OverclockMult += 0.25f),
-        new("Adrenaline Rush", "3 kills in 2s = atk burst", default, p => { p.AdrenalineWindow = 2f; p.AdrenalineBoost += 0.4f; }),
+        new("Overclock", "Secondary CD -30%", default, p => p.OverclockMult += 0.30f),
+        new("Adrenaline Rush", "3 kills in 2s = atk burst", default, p => { p.AdrenalineWindow = 2f; p.AdrenalineBoost += 0.45f; }),
     };
 
     public void Update(float dt, GameState state, GameStateManager manager)

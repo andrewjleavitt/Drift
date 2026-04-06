@@ -133,19 +133,15 @@ public static class UIRenderer
             DrawTextSmall("BUFF", barX + 44, buffY - 1, Color.Gold);
         }
 
-        // Weapon slots (bottom left): Primary | Secondary | Special
+        // Weapon slots (bottom left): up to 4 weapons + Special
         int weaponY = Constants.LogicalHeight - 28;
         for (int i = 0; i < state.EquippedWeapons.Count; i++)
         {
             var weapon = state.EquippedWeapons[i];
-            int wx = 4 + i * 32; // wider spacing for slot labels
-
-            // Slot label
-            string slotLabel = i == 0 ? "PRI" : "SEC";
-            Color slotColor = i == 0 ? Color.SkyBlue : Color.Orange;
+            int wx = 4 + i * 30;
 
             bool isReloading = state.WeaponReloadTimers[i] > 0;
-            bool isOnCooldown = state.WeaponCooldowns[i] > 0 && weapon.Def.Slot == Data.WeaponSlot.Secondary;
+            bool isOnCooldown = state.WeaponCooldowns[i] > 0 && weapon.Def.CooldownTime > 0;
 
             // Background
             Raylib.DrawRectangle(wx - 1, weaponY - 1, 28, 28, new Color(0, 0, 0, 150));
@@ -161,8 +157,8 @@ public static class UIRenderer
             Color weapTint = isReloading ? new Color((byte)100, (byte)100, (byte)100, (byte)255) : Color.White;
             state.Assets.Weapons.Draw(weapon.Def.SpriteIndex, wx + 2, weaponY + 2, weapTint);
 
-            // Slot label above
-            Raylib.DrawText(slotLabel, wx, weaponY - 9, 6, slotColor);
+            // Weapon number label above
+            Raylib.DrawText($"{i + 1}", wx + 10, weaponY - 9, 6, Color.LightGray);
 
             // Reload bar overlay
             if (isReloading)
@@ -171,8 +167,8 @@ public static class UIRenderer
                 Raylib.DrawRectangle(wx, weaponY + 24, (int)(26 * reloadPct), 2, Color.SkyBlue);
             }
 
-            // Clip ammo counter (primary only)
-            if (weapon.ClipSize > 0 && weapon.Def.Slot == Data.WeaponSlot.Primary)
+            // Clip ammo counter (for all weapons with clips)
+            if (weapon.ClipSize > 0)
             {
                 string ammoText = isReloading ? "R" : $"{state.WeaponClipAmmo[i]}";
                 Color ammoColor = isReloading ? Color.SkyBlue :
@@ -190,7 +186,7 @@ public static class UIRenderer
 
         // Special ability cooldown indicator
         {
-            int sx = 4 + state.EquippedWeapons.Count * 32;
+            int sx = 4 + state.EquippedWeapons.Count * 30;
             Raylib.DrawRectangle(sx - 1, weaponY - 1, 28, 28, new Color(0, 0, 0, 150));
             Raylib.DrawText("SPL", sx, weaponY - 9, 6, Color.Magenta);
 

@@ -38,7 +38,7 @@ public static class CharacterDatabase
             SpriteIndex = 0,
             BaseStats = new Stats
             {
-                MaxHP = 120, MoveSpeed = 85f, DamageMultiplier = 1.4f,
+                MaxHP = 120, MoveSpeed = 110f, DamageMultiplier = 1.4f,
                 AttackSpeedMultiplier = 1.0f, CritChance = 0.10f, CritDamage = 1.8f,
                 Armor = 2, DodgeChance = 0.05f, PickupRange = 50f, XPMultiplier = 1.0f,
                 ReloadSpeedMultiplier = 0.7f, // slower reload = ranged penalty
@@ -55,7 +55,7 @@ public static class CharacterDatabase
             SpriteIndex = 0,
             BaseStats = new Stats
             {
-                MaxHP = 60, MoveSpeed = 100f, DamageMultiplier = 1.5f,
+                MaxHP = 60, MoveSpeed = 120f, DamageMultiplier = 1.5f,
                 AttackSpeedMultiplier = 1.1f, CritChance = 0.08f, CritDamage = 1.5f,
                 Armor = 0, DodgeChance = 0.05f, PickupRange = 70f, XPMultiplier = 1.1f,
                 ReloadSpeedMultiplier = 1.0f,

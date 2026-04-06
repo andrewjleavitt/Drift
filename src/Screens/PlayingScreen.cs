@@ -839,38 +839,62 @@ public class PlayingScreen
 
     private void DrawWeapons(GameState state)
     {
+        var player = state.Player;
+
+        // Subtle orbit ring — faint circle showing weapon orbit path
+        if (state.EquippedWeapons.Count > 0)
+        {
+            Raylib.DrawCircleLinesV(player.Position, WeaponSystem.WeaponOrbitRadius,
+                new Color((byte)255, (byte)255, (byte)255, (byte)18));
+        }
+
         for (int w = 0; w < state.EquippedWeapons.Count; w++)
         {
             var weapon = state.EquippedWeapons[w];
 
             // BladeDancer's melee weapon is part of their hero animation — don't draw orbiting sprite
             if (weapon.Def.Type == Data.WeaponType.Melee &&
-                state.Player.HeroType == Data.HeroType.BladeDancer)
+                player.HeroType == Data.HeroType.BladeDancer)
                 continue;
 
             Vector2 weaponPos = WeaponSystem.GetWeaponWorldPosition(state, w);
             float angle = WeaponSystem.GetWeaponDrawAngle(state, w);
 
             var src = state.Assets.Weapons.GetSourceRect(weapon.Def.SpriteIndex);
-            float drawSize = Constants.SpriteSize * 0.7f;
+            float drawSize = Constants.SpriteSize * 0.75f;
             var dest = new Rectangle(weaponPos.X, weaponPos.Y, drawSize, drawSize);
             var origin = new Vector2(drawSize / 2f, drawSize / 2f);
             float angleDeg = angle * (180f / MathF.PI);
 
+            // Upgrade glow: subtle warm tint that intensifies with level
             Color tint = weapon.UpgradeLevel > 0
-                ? new Color((byte)255, (byte)(255 - weapon.UpgradeLevel * 15),
-                    (byte)(200 - weapon.UpgradeLevel * 30), (byte)255)
+                ? new Color((byte)255, (byte)Math.Max(180, 255 - weapon.UpgradeLevel * 12),
+                    (byte)Math.Max(140, 220 - weapon.UpgradeLevel * 20), (byte)255)
                 : Color.White;
+
+            // Drop shadow for depth
+            Raylib.DrawTexturePro(state.Assets.Weapons.Texture, src,
+                new Rectangle(weaponPos.X + 1f, weaponPos.Y + 1f, drawSize, drawSize),
+                origin, angleDeg, new Color((byte)0, (byte)0, (byte)0, (byte)80));
 
             Raylib.DrawTexturePro(state.Assets.Weapons.Texture, src, dest, origin, angleDeg, tint);
 
+            // Upgrade pips — small dots below weapon
             if (weapon.UpgradeLevel > 0)
             {
+                float pipSpacing = 2.5f;
+                float totalW = weapon.UpgradeLevel * pipSpacing;
+                // Place pips perpendicular to orbit angle (below weapon visually)
+                float perpAngle = angle + MathF.PI * 0.5f;
+                Vector2 pipBase = weaponPos + new Vector2(MathF.Cos(perpAngle), MathF.Sin(perpAngle)) * (drawSize * 0.45f);
+
                 for (int s = 0; s < weapon.UpgradeLevel; s++)
                 {
-                    float starX = weaponPos.X - (weapon.UpgradeLevel * 2f) / 2f + s * 2.5f;
-                    float starY = weaponPos.Y + drawSize / 2f + 2f;
-                    Raylib.DrawCircleV(new Vector2(starX, starY), 0.8f, Color.Gold);
+                    float offset = (s - (weapon.UpgradeLevel - 1) * 0.5f) * pipSpacing;
+                    // Offset along the orbit tangent direction
+                    float tangent = angle + MathF.PI * 0.5f;
+                    Vector2 pipPos = pipBase + new Vector2(-MathF.Sin(angle), MathF.Cos(angle)) * offset;
+                    Raylib.DrawCircleV(pipPos, 0.9f, Color.Gold);
                 }
             }
         }

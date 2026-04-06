@@ -8,31 +8,34 @@ public static class Constants
     public const int WindowWidth = LogicalWidth * WindowScale;
     public const int WindowHeight = LogicalHeight * WindowScale;
 
-    public const int ArenaWidth = 1600;
-    public const int ArenaHeight = 1200;
+    public const int ArenaWidth = 960;
+    public const int ArenaHeight = 540;
 
     public const int TileSize = 16;
     public const int SpriteSize = 24;
     public const int TileSpacing = 1;
 
-    public const int MaxWeaponSlots = 2; // Primary + Secondary
+    public const int MaxWeaponSlots = 4; // Brotato-style: up to 4 weapons, any mix
     public const int WavesPerBiome = 10;
     public const int BiomeCount = 3;
 
-    // Biome stat multipliers (HP, damage scale for enemies)
-    public static float BiomeStatScale(int biome) => biome switch
+    // Smooth difficulty scaling using global wave number (1-30)
+    // No biome stat jumps — new enemy types provide the biome difficulty bump
+    public static float WaveStatScale(int biome, int waveInBiome)
     {
-        2 => 1.3f,
-        3 => 1.6f,
-        _ => 1.0f,
-    };
+        int globalWave = (biome - 1) * WavesPerBiome + waveInBiome;
+        return 1f + (globalWave - 1) * 0.06f;
+    }
+
+    // Legacy — kept for any remaining references
+    public static float BiomeStatScale(int biome) => 1.0f;
 
     // Max concurrent enemies on screen per biome
     public static int BiomeEnemyCap(int biome) => biome switch
     {
-        2 => 80,
-        3 => 100,
-        _ => 60,
+        2 => 160,
+        3 => 200,
+        _ => 120,
     };
 
     public const float PlayerInvincibilityTime = 0.5f;

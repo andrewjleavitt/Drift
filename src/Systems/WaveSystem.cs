@@ -15,7 +15,7 @@ public static class WaveSystem
 
         // Spawn enemies (respecting per-biome density cap)
         // Global density multiplier — applied to both count and rate
-        const float DensityMult = 2.0f;
+        const float DensityMult = 3.5f;
         int totalEnemies = (int)(config.TotalEnemies * DensityMult);
         float spawnRate = config.BaseSpawnRate * DensityMult;
 

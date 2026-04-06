@@ -75,8 +75,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Tribe Hunter", SpriteIndex = 0,
-            BaseHP = 25, BaseSpeed = 45f, BaseDamage = 8,
-            XPValue = 2, GoldValue = 1, Radius = 12f,
+            BaseHP = 25, BaseSpeed = 55f, BaseDamage = 8,
+            XPValue = 1, GoldValue = 1, Radius = 12f,
             Behavior = Entities.EnemyBehavior.Chase,
             AttackType = EnemyAttackType.Ranged,
             AttackCooldown = 1.8f, AttackRange = 110f,
@@ -86,8 +86,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Small Bug", SpriteIndex = 4,
-            BaseHP = 15, BaseSpeed = 70f, BaseDamage = 5,
-            XPValue = 2, GoldValue = 1, Radius = 8f,
+            BaseHP = 15, BaseSpeed = 90f, BaseDamage = 5,
+            XPValue = 1, GoldValue = 1, Radius = 8f,
             Behavior = Entities.EnemyBehavior.FastChase,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 0.8f, AttackRange = 22f,
@@ -96,8 +96,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Medium Insect", SpriteIndex = 8,
-            BaseHP = 18, BaseSpeed = 55f, BaseDamage = 6,
-            XPValue = 3, GoldValue = 2, Radius = 11f,
+            BaseHP = 18, BaseSpeed = 68f, BaseDamage = 6,
+            XPValue = 1, GoldValue = 1, Radius = 11f,
             Behavior = Entities.EnemyBehavior.Erratic,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 1.2f, AttackRange = 25f,
@@ -108,30 +108,30 @@ public static class EnemyDatabase
         new()
         {
             Name = "Tribe Warrior", SpriteIndex = 12,
-            BaseHP = 60, BaseSpeed = 30f, BaseDamage = 15,
-            XPValue = 5, GoldValue = 3, Radius = 14f,
+            BaseHP = 60, BaseSpeed = 38f, BaseDamage = 12,
+            XPValue = 2, GoldValue = 2, Radius = 14f,
             Behavior = Entities.EnemyBehavior.Tank,
             AttackType = EnemyAttackType.Melee,
-            AttackCooldown = 1.6f, AttackRange = 30f,
-            AttackAnimDuration = 0.55f, AttackDamageMultiplier = 1.4f,
+            AttackCooldown = 1.8f, AttackRange = 30f,
+            AttackAnimDuration = 0.55f, AttackDamageMultiplier = 1.3f,
         },
         // Humanoid / Starter Pack (index 4-6)
         new()
         {
             Name = "Archer", SpriteIndex = 0,
-            BaseHP = 20, BaseSpeed = 40f, BaseDamage = 10,
-            XPValue = 3, GoldValue = 2, Radius = 10f,
+            BaseHP = 20, BaseSpeed = 50f, BaseDamage = 10,
+            XPValue = 1, GoldValue = 1, Radius = 10f,
             Behavior = Entities.EnemyBehavior.Erratic,
             AttackType = EnemyAttackType.Ranged,
-            AttackCooldown = 1.2f, AttackRange = 130f,
-            AttackAnimDuration = 0.35f, AttackDamageMultiplier = 0.9f,
-            ProjectileSpeed = 210f,
+            AttackCooldown = 2.0f, AttackRange = 130f,
+            AttackAnimDuration = 0.35f, AttackDamageMultiplier = 0.7f,
+            ProjectileSpeed = 180f,
         },
         new()
         {
             Name = "Guard", SpriteIndex = 0,
-            BaseHP = 45, BaseSpeed = 35f, BaseDamage = 12,
-            XPValue = 4, GoldValue = 2, Radius = 12f,
+            BaseHP = 45, BaseSpeed = 42f, BaseDamage = 12,
+            XPValue = 2, GoldValue = 1, Radius = 12f,
             Behavior = Entities.EnemyBehavior.Tank,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 1.4f, AttackRange = 28f,
@@ -141,20 +141,20 @@ public static class EnemyDatabase
         new()
         {
             Name = "Warrior", SpriteIndex = 0,
-            BaseHP = 55, BaseSpeed = 38f, BaseDamage = 14,
-            XPValue = 4, GoldValue = 3, Radius = 11f,
+            BaseHP = 55, BaseSpeed = 48f, BaseDamage = 12,
+            XPValue = 2, GoldValue = 1, Radius = 11f,
             Behavior = Entities.EnemyBehavior.Chase,
             AttackType = EnemyAttackType.Melee,
-            AttackCooldown = 1.0f, AttackRange = 26f,
-            AttackAnimDuration = 0.35f, AttackDamageMultiplier = 1.3f,
-            CanRush = true, RushCooldown = 3.5f, RushDuration = 0.25f, RushSpeedMult = 3.5f,
+            AttackCooldown = 1.2f, AttackRange = 26f,
+            AttackAnimDuration = 0.35f, AttackDamageMultiplier = 1.2f,
+            CanRush = true, RushCooldown = 4.0f, RushDuration = 0.25f, RushSpeedMult = 3f,
         },
         // Insects (index 7-8)
         new()
         {
             Name = "Big Bug", SpriteIndex = 0,
-            BaseHP = 80, BaseSpeed = 25f, BaseDamage = 18,
-            XPValue = 6, GoldValue = 4, Radius = 16f,
+            BaseHP = 80, BaseSpeed = 32f, BaseDamage = 18,
+            XPValue = 3, GoldValue = 2, Radius = 16f,
             Behavior = Entities.EnemyBehavior.Tank,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 3.0f, AttackRange = 50f,
@@ -164,8 +164,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Spiny Beetle", SpriteIndex = 0,
-            BaseHP = 30, BaseSpeed = 60f, BaseDamage = 10,
-            XPValue = 3, GoldValue = 2, Radius = 14f,
+            BaseHP = 30, BaseSpeed = 72f, BaseDamage = 10,
+            XPValue = 1, GoldValue = 1, Radius = 14f,
             Behavior = Entities.EnemyBehavior.Erratic,
             AttackType = EnemyAttackType.Ranged,
             AttackCooldown = 1.5f, AttackRange = 120f,
@@ -176,20 +176,20 @@ public static class EnemyDatabase
         new()
         {
             Name = "Relic Guardian", SpriteIndex = 0,
-            BaseHP = 70, BaseSpeed = 32f, BaseDamage = 16,
-            XPValue = 7, GoldValue = 4, Radius = 16f,
+            BaseHP = 70, BaseSpeed = 40f, BaseDamage = 12,
+            XPValue = 3, GoldValue = 2, Radius = 16f,
             Behavior = Entities.EnemyBehavior.Tank,
             AttackType = EnemyAttackType.Melee,
-            AttackCooldown = 2.2f, AttackRange = 38f,
-            AttackAnimDuration = 0.6f, AttackDamageMultiplier = 1.6f,
-            EnragesAtLowHP = true,
+            AttackCooldown = 2.5f, AttackRange = 38f,
+            AttackAnimDuration = 0.6f, AttackDamageMultiplier = 1.4f,
+            EnragesAtLowHP = true, EnrageDamageMult = 1.2f,
         },
         // Robots (index 10-13)
         new()
         {
             Name = "Rusty Robot", SpriteIndex = 0,
-            BaseHP = 20, BaseSpeed = 65f, BaseDamage = 7,
-            XPValue = 2, GoldValue = 1, Radius = 8f,
+            BaseHP = 20, BaseSpeed = 80f, BaseDamage = 7,
+            XPValue = 1, GoldValue = 1, Radius = 8f,
             Behavior = Entities.EnemyBehavior.FastChase,
             AttackType = EnemyAttackType.Kamikaze,
             FuseDuration = 5f, ExplosionRadius = 40f, ExplosionDamageMultiplier = 3f,
@@ -197,8 +197,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Guard Robot", SpriteIndex = 0,
-            BaseHP = 50, BaseSpeed = 30f, BaseDamage = 14,
-            XPValue = 5, GoldValue = 3, Radius = 12f,
+            BaseHP = 50, BaseSpeed = 38f, BaseDamage = 14,
+            XPValue = 2, GoldValue = 2, Radius = 12f,
             Behavior = Entities.EnemyBehavior.Tank,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 1.5f, AttackRange = 30f,
@@ -208,8 +208,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Circle Bot", SpriteIndex = 0,
-            BaseHP = 35, BaseSpeed = 45f, BaseDamage = 10,
-            XPValue = 3, GoldValue = 2, Radius = 12f,
+            BaseHP = 35, BaseSpeed = 55f, BaseDamage = 10,
+            XPValue = 1, GoldValue = 1, Radius = 12f,
             Behavior = Entities.EnemyBehavior.Erratic,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 2.5f, AttackRange = 45f,
@@ -219,16 +219,16 @@ public static class EnemyDatabase
         new()
         {
             Name = "Delivery Bot", SpriteIndex = 0,
-            BaseHP = 25, BaseSpeed = 85f, BaseDamage = 0,
-            XPValue = 8, GoldValue = 12, Radius = 7f,
+            BaseHP = 25, BaseSpeed = 100f, BaseDamage = 0,
+            XPValue = 3, GoldValue = 5, Radius = 7f,
             Behavior = Entities.EnemyBehavior.Flee,
         },
         // Minions (index 14-16)
         new()
         {
             Name = "Hooded Minion", SpriteIndex = 0,
-            BaseHP = 30, BaseSpeed = 42f, BaseDamage = 11,
-            XPValue = 3, GoldValue = 2, Radius = 10f,
+            BaseHP = 30, BaseSpeed = 55f, BaseDamage = 11,
+            XPValue = 1, GoldValue = 1, Radius = 10f,
             Behavior = Entities.EnemyBehavior.Chase,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 0.9f, AttackRange = 24f,
@@ -238,8 +238,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Bomb Minion", SpriteIndex = 0,
-            BaseHP = 10, BaseSpeed = 75f, BaseDamage = 3,
-            XPValue = 2, GoldValue = 1, Radius = 5f,
+            BaseHP = 10, BaseSpeed = 90f, BaseDamage = 3,
+            XPValue = 1, GoldValue = 1, Radius = 5f,
             Behavior = Entities.EnemyBehavior.FastChase,
             AttackType = EnemyAttackType.Kamikaze,
             FuseDuration = 4f, ExplosionRadius = 55f, ExplosionDamageMultiplier = 4f,
@@ -247,11 +247,11 @@ public static class EnemyDatabase
         new()
         {
             Name = "Ranged Minion", SpriteIndex = 0,
-            BaseHP = 22, BaseSpeed = 38f, BaseDamage = 8,
-            XPValue = 3, GoldValue = 2, Radius = 8f,
+            BaseHP = 22, BaseSpeed = 48f, BaseDamage = 8,
+            XPValue = 1, GoldValue = 1, Radius = 8f,
             Behavior = Entities.EnemyBehavior.Erratic,
             AttackType = EnemyAttackType.Ranged,
-            AttackCooldown = 1.3f, AttackRange = 115f,
+            AttackCooldown = 1.6f, AttackRange = 115f,
             AttackAnimDuration = 0.4f, AttackDamageMultiplier = 0.7f,
             ProjectileSpeed = 190f, ProjectileCount = 3, ProjectileSpread = 0.25f,
         },
@@ -259,8 +259,8 @@ public static class EnemyDatabase
         new()
         {
             Name = "Planter Bot", SpriteIndex = 0,
-            BaseHP = 28, BaseSpeed = 35f, BaseDamage = 6,
-            XPValue = 3, GoldValue = 2, Radius = 11f,
+            BaseHP = 28, BaseSpeed = 45f, BaseDamage = 6,
+            XPValue = 1, GoldValue = 1, Radius = 11f,
             Behavior = Entities.EnemyBehavior.Chase,
             AttackType = EnemyAttackType.Melee,
             AttackCooldown = 2.0f, AttackRange = 32f,

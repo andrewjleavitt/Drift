@@ -15,6 +15,7 @@ public class ShopScreen
     private int _navRow;
     private int _navCol;
 
+
     public void Update(float dt, GameState state, GameStateManager manager)
     {
         if (!_initialized)
@@ -46,13 +47,17 @@ public class ShopScreen
 
         if (InputHelper.IsConfirmPressed())
             ActivateSelected(state, manager);
+
+        // Sell weapon: S key or Backspace when on weapon row
+        if (_navRow == 0 && (Raylib.IsKeyPressed(KeyboardKey.S) || Raylib.IsKeyPressed(KeyboardKey.Backspace)))
+            SellWeapon(state, _navCol);
     }
 
     private void ActivateSelected(GameState state, GameStateManager manager)
     {
         switch (_navRow)
         {
-            case 0: // Upgrade weapon
+            case 0: // Upgrade or sell weapon
                 if (_navCol < state.EquippedWeapons.Count)
                 {
                     var weapon = state.EquippedWeapons[_navCol];
@@ -87,6 +92,24 @@ public class ShopScreen
         }
     }
 
+    private void SellWeapon(GameState state, int index)
+    {
+        if (index < 0 || index >= state.EquippedWeapons.Count) return;
+        if (state.EquippedWeapons.Count <= 1) return; // can't sell last weapon
+
+        var weapon = state.EquippedWeapons[index];
+        int sellPrice = weapon.Def.Cost / 2 + weapon.UpgradeLevel * 8; // half base + some for upgrades
+        state.Gold += sellPrice;
+
+        state.EquippedWeapons.RemoveAt(index);
+        state.WeaponCooldowns.RemoveAt(index);
+        state.WeaponClipAmmo.RemoveAt(index);
+        state.WeaponReloadTimers.RemoveAt(index);
+        state.WeaponOrbitAngles.RemoveAt(index);
+
+        state.Assets.PlaySoundVariant("coin", 0.5f);
+    }
+
     private void TryBuyItem(GameState state, int index)
     {
         if (index >= _shopItems.Count) return;
@@ -94,30 +117,17 @@ public class ShopScreen
         if (_shopItems[index] is WeaponDef weapon)
         {
             if (state.Gold < weapon.Cost) return;
+            if (state.EquippedWeapons.Count >= Constants.MaxWeaponSlots) return; // slots full — sell first
 
             state.Gold -= weapon.Cost;
             var newWeapon = new WeaponInstance(weapon);
 
-            // Replace or add to the appropriate slot
-            int slotIndex = weapon.Slot == WeaponSlot.Primary ? 0 : 1;
+            state.EquippedWeapons.Add(newWeapon);
+            state.WeaponCooldowns.Add(0f);
+            state.WeaponClipAmmo.Add(newWeapon.ClipSize);
+            state.WeaponReloadTimers.Add(0f);
+            state.WeaponOrbitAngles.Add(0f);
 
-            if (slotIndex < state.EquippedWeapons.Count)
-            {
-                // Replace existing weapon in this slot
-                state.EquippedWeapons[slotIndex] = newWeapon;
-                state.WeaponCooldowns[slotIndex] = 0f;
-                state.WeaponClipAmmo[slotIndex] = newWeapon.ClipSize;
-                state.WeaponReloadTimers[slotIndex] = 0f;
-            }
-            else
-            {
-                // Add to empty slot (secondary when only primary exists)
-                state.EquippedWeapons.Add(newWeapon);
-                state.WeaponCooldowns.Add(0f);
-                state.WeaponClipAmmo.Add(newWeapon.ClipSize);
-                state.WeaponReloadTimers.Add(0f);
-                state.WeaponOrbitAngles.Add(0f);
-            }
             _shopItems.RemoveAt(index);
             state.Assets.PlaySoundVariant("select", 0.5f);
         }
@@ -145,8 +155,6 @@ public class ShopScreen
             if (w.ShopTier > maxTier) return false;
             // Melee weapons only for BladeDancer
             if (w.Type == WeaponType.Melee && !isBladeDancer) return false;
-            // BladeDancer doesn't need primary gun offers (their melee is innate)
-            // But they DO want secondary weapons
             return true;
         }).ToList();
 
@@ -155,12 +163,12 @@ public class ShopScreen
         Shuffle(availableWeapons);
         Shuffle(availableItems);
 
-        // Offer 1 primary + 1 secondary weapon (if available)
-        var primary = availableWeapons.FirstOrDefault(w => w.Slot == WeaponSlot.Primary);
-        var secondary = availableWeapons.FirstOrDefault(w => w.Slot == WeaponSlot.Secondary);
-        if (primary != null) _shopItems.Add(primary);
-        if (secondary != null) _shopItems.Add(secondary);
+        // Offer 2-3 weapons (more variety with 4 slots to fill)
+        int weaponOffers = Math.Min(3, availableWeapons.Count);
+        for (int i = 0; i < weaponOffers; i++)
+            _shopItems.Add(availableWeapons[i]);
 
+        // Offer 1-2 items
         for (int i = 0; i < Math.Min(2, availableItems.Count); i++)
             _shopItems.Add(availableItems[i]);
     }
@@ -197,12 +205,13 @@ public class ShopScreen
 
         var mouse = Display.ScreenToLogical(Raylib.GetMousePosition());
 
-        // === WEAPON UPGRADES (top section) ===
+        // === WEAPON UPGRADES + SELL (top section) ===
         if (state.EquippedWeapons.Count > 0)
         {
-            UIRenderer.DrawTextSmall("UPGRADE WEAPONS", 20, 48, Color.Orange);
+            string slotsLabel = $"WEAPONS ({state.EquippedWeapons.Count}/{Constants.MaxWeaponSlots})";
+            UIRenderer.DrawTextSmall(slotsLabel, 20, 48, Color.Orange);
 
-            int ugW = 120, ugH = 44;
+            int ugW = 120, ugH = 52;
             int ugY = 60;
             for (int i = 0; i < state.EquippedWeapons.Count; i++)
             {
@@ -249,20 +258,45 @@ public class ShopScreen
                 {
                     UIRenderer.DrawTextSmall("MAX LEVEL", ux + 26, ugY + 18, Color.Gold);
                 }
+
+                // Sell button (always visible if more than 1 weapon)
+                if (state.EquippedWeapons.Count > 1)
+                {
+                    int sellPrice = weapon.Def.Cost / 2 + weapon.UpgradeLevel * 8;
+                    int sellBtnY = ugY + ugH - 12;
+                    int sellBtnW = ugW - 4;
+                    bool sellHovered = mouse.X >= ux + 2 && mouse.X <= ux + 2 + sellBtnW
+                        && mouse.Y >= sellBtnY && mouse.Y <= sellBtnY + 11;
+
+                    Color sellBg = sellHovered ? new Color(120, 40, 40, 255) : new Color(80, 30, 30, 255);
+                    Raylib.DrawRectangle(ux + 2, sellBtnY, sellBtnW, 11, sellBg);
+                    UIRenderer.DrawTextSmall($"SELL ${sellPrice}", ux + 4, sellBtnY + 2,
+                        sellHovered ? Color.White : Color.LightGray);
+
+                    if (sellHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
+                        SellWeapon(state, i);
+
+                    // Right-click to sell when hovered on the card
+                    if (hovered && Raylib.IsMouseButtonPressed(MouseButton.Right))
+                        SellWeapon(state, i);
+                }
             }
         }
 
         // === BUY NEW WEAPONS & ITEMS (bottom section) ===
-        UIRenderer.DrawTextSmall("BUY", 20, 116, Color.SkyBlue);
+        bool slotsFull = state.EquippedWeapons.Count >= Constants.MaxWeaponSlots;
+        UIRenderer.DrawTextSmall("BUY", 20, 122, Color.SkyBlue);
+        if (slotsFull)
+            UIRenderer.DrawTextSmall("(sell a weapon to make room)", 40, 122, new Color(255, 150, 150, 255));
 
-        int cardW = 120, cardH = 75;
-        int totalW = _shopItems.Count > 0 ? _shopItems.Count * (cardW + 8) - 8 : 0;
+        int cardW = 110, cardH = 72;
+        int totalW = _shopItems.Count > 0 ? _shopItems.Count * (cardW + 6) - 6 : 0;
         int startX = Constants.LogicalWidth / 2 - totalW / 2;
-        int cardY = 128;
+        int cardY = 134;
 
         for (int i = 0; i < _shopItems.Count; i++)
         {
-            int cx = startX + i * (cardW + 8);
+            int cx = startX + i * (cardW + 6);
             bool hovered = mouse.X >= cx && mouse.X <= cx + cardW && mouse.Y >= cardY && mouse.Y <= cardY + cardH;
             bool selected = _navRow == 1 && _navCol == i;
 
@@ -279,19 +313,27 @@ public class ShopScreen
 
             if (_shopItems[i] is WeaponDef weapon)
             {
-                // Slot label
-                string slotLabel = weapon.Slot == WeaponSlot.Secondary ? "[SECONDARY]" : "[PRIMARY]";
-                Color slotColor = weapon.Slot == WeaponSlot.Secondary ? Color.Orange : Color.SkyBlue;
-                UIRenderer.DrawTextSmall(slotLabel, cx + 4, cardY + 3, slotColor);
+                // Weapon type label
+                string typeLabel = weapon.Type == WeaponType.Melee ? "[MELEE]"
+                    : weapon.ExplosionRadius > 0 || weapon.IsMine || weapon.IsLockOn ? "[TACTICAL]"
+                    : "[GUN]";
+                Color typeColor = weapon.Type == WeaponType.Melee ? Color.Orange
+                    : weapon.ExplosionRadius > 0 || weapon.IsMine || weapon.IsLockOn ? new Color(255, 180, 80, 255)
+                    : Color.SkyBlue;
+                UIRenderer.DrawTextSmall(typeLabel, cx + 4, cardY + 3, typeColor);
 
                 state.Assets.Weapons.Draw(weapon.SpriteIndex, cx + cardW / 2 - 12, cardY + 12, Color.White);
                 UIRenderer.DrawTextSmall(weapon.Name, cx + 4, cardY + 36, Color.White);
                 UIRenderer.DrawTextSmall($"DMG:{weapon.BaseDamage:F0} SPD:{weapon.FireRate:F1}", cx + 4, cardY + 46, Color.LightGray);
-                bool canAfford = state.Gold >= weapon.Cost;
-                UIRenderer.DrawTextSmall($"${weapon.Cost}", cx + 4, cardY + 58,
-                    canAfford ? Color.Green : Color.Red);
 
-                if (hovered && Raylib.IsMouseButtonPressed(MouseButton.Left) && canAfford)
+                bool canAfford = state.Gold >= weapon.Cost;
+                bool canBuy = canAfford && !slotsFull;
+                UIRenderer.DrawTextSmall($"${weapon.Cost}", cx + 4, cardY + 58,
+                    canBuy ? Color.Green : Color.Red);
+                if (slotsFull && canAfford)
+                    UIRenderer.DrawTextSmall("FULL", cx + cardW - 26, cardY + 58, Color.Red);
+
+                if (hovered && Raylib.IsMouseButtonPressed(MouseButton.Left) && canBuy)
                 {
                     _navRow = 1;
                     _navCol = i;
@@ -338,8 +380,8 @@ public class ShopScreen
         }
 
         string hint = InputHelper.GamepadAvailable
-            ? "D-Pad navigate, A select/buy"
-            : "Arrows navigate, Enter select/buy";
+            ? "D-Pad navigate, A buy/upgrade"
+            : "Click buy/upgrade, Right-click sell";
         UIRenderer.DrawTextSmall(hint,
             Constants.LogicalWidth / 2 - hint.Length * 5 / 2, Constants.LogicalHeight - 8, Color.Gray);
     }

@@ -81,6 +81,48 @@ public static class PlayerSystem
             state.MouseWorldPosition = player.Position + player.LastMoveDirection * 80f;
         }
 
+        // Auto-aim: find nearest enemy and override aim + auto-fire (Brotato-style)
+        // BladeDancer excluded — melee uses movement-based aim
+        if (state.AutoAimEnabled && player.HeroType != Data.HeroType.BladeDancer)
+        {
+            float bestDist = float.MaxValue;
+            int bestIdx = -1;
+
+            // Use the longest-range equipped weapon as the auto-aim radius
+            float autoAimRadius = 200f; // minimum fallback
+            for (int w = 0; w < state.EquippedWeapons.Count; w++)
+            {
+                var wep = state.EquippedWeapons[w];
+                if (wep.Range > autoAimRadius)
+                    autoAimRadius = wep.Range;
+            }
+            autoAimRadius *= 1.2f; // acquire targets slightly before they enter weapon range
+
+            for (int e = 0; e < state.Enemies.Count; e++)
+            {
+                var enemy = state.Enemies[e];
+                if (!enemy.Active || enemy.IsDying || enemy.IsBurrowed) continue;
+                float dist = Vector2.Distance(player.Position, enemy.Position);
+                if (dist < bestDist && dist < autoAimRadius)
+                {
+                    bestDist = dist;
+                    bestIdx = e;
+                }
+            }
+
+            if (bestIdx >= 0)
+            {
+                // Override aim to point at nearest enemy
+                state.MouseWorldPosition = state.Enemies[bestIdx].Position;
+                // Auto-fire all weapons: primary, secondary, everything
+                state.IsFiring = true;
+                state.IsFirePressed = true;
+                state.IsSecondaryFiring = true;
+                state.IsSecondaryDown = true;
+            }
+            // When no enemies in range, fall back to mouse/stick aim (already set above)
+        }
+
         // Dash initiation
         if (InputHelper.IsDashPressed() && player.DashCooldownTimer <= 0)
         {

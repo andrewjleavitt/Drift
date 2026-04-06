@@ -348,7 +348,7 @@ public static class EnemySystem
                         if (spiderling == null) break;
                         float sAngle = (MathF.PI * 2f / spiderlingCount) * s;
                         Vector2 sPos = enemy.Position + new Vector2(MathF.Cos(sAngle), MathF.Sin(sAngle)) * 30f;
-                        float sFactor = (1f + (state.CurrentWave - 1) * 0.08f) * Constants.BiomeStatScale(state.CurrentBiome);
+                        float sFactor = Constants.WaveStatScale(state.CurrentBiome, state.CurrentWave);
                         spiderling.Init(EnemyDatabase.Enemies[1], sPos, sFactor); // Small Bug
                         spiderling.DefIndex = 1;
                         spiderling.Speed *= 1.2f; // slightly faster
@@ -642,7 +642,7 @@ public static class EnemySystem
                                     if (bug == null) break;
                                     float bAngle = Random.Shared.NextSingle() * MathF.PI * 2f;
                                     Vector2 bPos = enemy.Position + new Vector2(MathF.Cos(bAngle), MathF.Sin(bAngle)) * 20f;
-                                    float sFactor = (1f + (state.CurrentWave - 1) * 0.08f) * Constants.BiomeStatScale(state.CurrentBiome);
+                                    float sFactor = Constants.WaveStatScale(state.CurrentBiome, state.CurrentWave);
                                     bug.Init(EnemyDatabase.Enemies[1], bPos, sFactor); // Small Bug
                                     bug.DefIndex = 1;
                                 }
@@ -851,8 +851,8 @@ public static class EnemySystem
         }
         var def = EnemyDatabase.Enemies[typeIndex];
 
-        // Scale stats based on wave (+8% per wave) and biome multiplier
-        float scaleFactor = (1f + (waveNumber - 1) * 0.08f) * Constants.BiomeStatScale(state.CurrentBiome);
+        // Smooth scaling using global wave number (1-30) — no biome stat jumps
+        float scaleFactor = Constants.WaveStatScale(state.CurrentBiome, waveNumber);
 
         // Spawn from random arena edge
         Vector2 spawnPos = GetEdgeSpawnPosition(state.Player.Position);

@@ -46,6 +46,7 @@ public class GameState
     public bool IsSecondaryFiring; // true on the frame secondary fire is pressed (LT / right click)
     public bool IsSecondaryDown;   // true while secondary fire is held (for hold-through-cooldown)
     public bool IsSpecialActivated; // true on the frame special ability is pressed (LB / Q)
+    public bool AutoAimEnabled = true; // Brotato-style: auto-target nearest enemy for ranged heroes
 
     // Special ability cooldown (hero-specific, not a weapon)
     public float SpecialCooldown;
@@ -430,7 +431,7 @@ public class GameState
         if (enemy.DefIndex == 7 && !enemy.IsBoss)
         {
             int burstCount = 2 + (CurrentWave >= 7 ? 1 : 0); // 3 in later waves
-            float scaleFactor = (1f + (CurrentWave - 1) * 0.08f) * Constants.BiomeStatScale(CurrentBiome);
+            float scaleFactor = Constants.WaveStatScale(CurrentBiome, CurrentWave);
             for (int b = 0; b < burstCount; b++)
             {
                 var bug = GetInactiveEnemy();
@@ -499,7 +500,7 @@ public class GameState
         {
             XP -= XPToNextLevel;
             Level++;
-            XPToNextLevel = 5 + Level * 3;
+            XPToNextLevel = 8 + Level * 4 + Level * Level / 2;
             PendingLevelUps++;
             LevelUpPending = true;
         }
@@ -525,7 +526,7 @@ public class GameState
         int[] biomeScatter = AssetManager.GetBiomeScatter(CurrentBiome);
 
         // --- Pattern-based placement (2-4 formations) ---
-        int patternCount = rng.Next(2, 5);
+        int patternCount = rng.Next(1, 3);
         for (int p = 0; p < patternCount; p++)
         {
             // Pick a random center for this formation, away from spawn
@@ -568,7 +569,7 @@ public class GameState
         }
 
         // --- Fill remaining with random singles (up to target) ---
-        int targetObstacles = rng.Next(10, 16);
+        int targetObstacles = rng.Next(6, 10);
         int remaining = targetObstacles - Obstacles.Count;
         for (int i = 0; i < remaining; i++)
         {
@@ -578,7 +579,7 @@ public class GameState
         // --- Ground scatter (biome-filtered) ---
         if (useStranded && Assets.GroundScatterTextures.Length > 0 && biomeScatter.Length > 0)
         {
-            int scatterCount = rng.Next(40, 70);
+            int scatterCount = rng.Next(20, 35);
             for (int i = 0; i < scatterCount; i++)
             {
                 float x = rng.NextSingle() * Constants.ArenaWidth;
@@ -595,7 +596,7 @@ public class GameState
         // Large accent props — waste/swamp only (swords/poles don't fit temple)
         if (useStranded && Assets.LargeScatterTextures.Length > 0 && CurrentBiome != 3)
         {
-            int accentCount = rng.Next(5, 12);
+            int accentCount = rng.Next(3, 7);
             for (int i = 0; i < accentCount; i++)
             {
                 float x = rng.NextSingle() * (Constants.ArenaWidth - 40) + 20;
@@ -611,7 +612,7 @@ public class GameState
         }
 
         // --- Barrels (4-8) ---
-        int barrelCount = rng.Next(4, 9);
+        int barrelCount = rng.Next(3, 6);
         for (int i = 0; i < barrelCount; i++)
         {
             for (int attempt = 0; attempt < 20; attempt++)
@@ -651,7 +652,7 @@ public class GameState
         }
 
         // --- Terrain zones (biome-specific mix) ---
-        int zoneCount = rng.Next(3, 6);
+        int zoneCount = rng.Next(2, 4);
         for (int i = 0; i < zoneCount; i++)
         {
             for (int attempt = 0; attempt < 20; attempt++)
@@ -696,7 +697,7 @@ public class GameState
 
         // Decorative patches
         int decoSet = rng.Next(3);
-        int decoCount = rng.Next(3, 7);
+        int decoCount = rng.Next(2, 5);
         for (int i = 0; i < decoCount; i++)
         {
             for (int attempt = 0; attempt < 20; attempt++)
